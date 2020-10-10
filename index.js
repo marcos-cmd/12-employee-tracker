@@ -53,4 +53,30 @@ const addDepartment = async () => {
         })
 };
 
+const addRole = () => {
+    inquirer.prompt([
+        {
+            name: 'title',
+            type: 'input',
+            message: 'What is the title of the role you are adding?'
+        },
+        {
+            name: 'salary',
+            type: 'input',
+            message: 'What is the proposed salary for this role?'
+        },
+        {
+            name: 'department_id',
+            type: 'input',
+            message: 'What is the department ID of the role?'
+        }
+    ]).then (({title, salary, department_id}) => {
+        const query = 'INSERT INTO roles SET ?;';
+        connection.query(query, {title, salary, department_id}, err => {
+            if (err) throw err;
+        });
+        viewRole();
+    })
+}
+
 start();
