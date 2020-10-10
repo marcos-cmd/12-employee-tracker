@@ -1,43 +1,40 @@
 const inquirer = require("inquirer");
-
-function isNotBlank(input) {
-    return input !== '' || "Cannot leave blank";
-}
-
 const startPrompt = {
     name: 'options',
     type: 'list',
     message: 'Please select an option to continue',
-    choices: [new inquirer.Separator('-----Add-----'),
+    choices: [new inquirer.Separator('───────────────────── Add───────────────────── '),
         'Add a Department',
         'Add a Role',
         'Add an Employee',
-        new inquirer.Separator('-----View-----'),
+        new inquirer.Separator('───────────────────── View───────────────────── '),
         'View Departments',
         'View a Role',
         'View an Employee',
         'View Employees by Manager',
         'View Department\'s salary budget',
-        new inquirer.Separator('-----Update-----'),
+        new inquirer.Separator('───────────────────── Update───────────────────── '),
         'Update an Employee\'s Role',
         'Update an Employee\'s Manager',
-        new inquirer.Separator('-----Delete-----'),
+        new inquirer.Separator('───────────────────── Delete───────────────────── '),
         'Delete a Department',
         'Delete a Role',
         'Delete an Employee',
-        new inquirer.Separator('-----Exit-----'),
+        new inquirer.Separator('───────────────────── Exit───────────────────── '),
         'Exit menu'
       ]
 };
- 
-   const addDeptPrompt = {
+
+function isNotBlank(input) {
+    return input !== '' || "Cannot leave blank";
+}
+ const addDeptPrompt = {
     type: 'input',
             name: 'department',
             message: 'Which department would you like to add?',
             validate: isNotBlank
 };
- 
-   const addRolePrompt = [
+ const addRolePrompt = [
     {
         name: 'title',
         type: 'input',
@@ -58,7 +55,7 @@ const startPrompt = {
     }
 ];
  
-   const addEmployeePrompt = [
+const addEmployeePrompt = [
     {
         name: 'first',
         type: 'input',
@@ -73,7 +70,7 @@ const startPrompt = {
     },
 ];
  
-   module.exports = {
+module.exports = {
     startPrompt,
     addDeptPrompt,
     addRolePrompt,

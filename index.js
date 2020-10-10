@@ -59,7 +59,8 @@ const addDepartment = async () => {
             connection.query(insertDepts, {name}, err => {
                 if (err) throw err;
             });
-            viewDept();
+            console.log(`Added ${name} to the database.`);
+            start();
         })
 };
 
@@ -68,7 +69,8 @@ const addRole = () => {
         connection.query(insertRoles, {title, salary, department_id}, err => {
             if (err) throw err;
         });
-        viewRole();
+        console.log(`Added ${title} to the database.`);
+        start();
     })
 }
 const addEmployee = () => {
@@ -112,6 +114,7 @@ const addEmployee = () => {
                                 arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
                             }
                         }
+                        arr.push('No one');
                         return arr;
                     }
                 }).then(res => {
@@ -124,7 +127,8 @@ const addEmployee = () => {
                     connection.query(insertEmployees, {first_name, last_name, role_id, manager_id}, err => {
                         if (err) throw err;
                     });
-                    viewEmployee();
+                    console.log(`Added ${first_name} ${last_name} to the database.`);
+                    start();
                 });
             });
         })
@@ -173,9 +177,13 @@ const updateRole = () => {
             }
         }).then(res => {
             let id;
+            let first_name;
+            let last_name;
             for (let i = 0; i < employeeArr.length; i++) {
                 if (res.employee === `${employeeArr[i].first_name} ${employeeArr[i].last_name}`) {
                     id = employeeArr[i].id;
+                    first_name = employeeArr[i].first_name;
+                    last_name = employeeArr[i].last_name;
                 }
             }
             connection.query(selectEmployees, (err, res) => {
@@ -201,7 +209,8 @@ const updateRole = () => {
                     connection.query(updateEmployees, [{role_id}, {id}], err => {
                         if (err) throw err;
                     })
-                    viewEmployee();
+                    console.log(`${first_name} ${last_name}'s role has been updated to ${res.role}.`);
+                    start();
                 });
             });
         });
@@ -220,7 +229,7 @@ const updateManager = () => {
                     arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
                 }
             }
-            arr.push('None');
+            arr.push('No one');
             return arr;
         }
         inquirer.prompt([
@@ -250,7 +259,8 @@ const updateManager = () => {
             connection.query(updateEmployees, [{manager_id}, {id}], err => {
                 if (err) throw err;
             })
-            viewEmployee();
+            console.log(`${res.manager} has been set as the manager for ${res.employee}.`);
+            start();
         });
     });
 }
@@ -333,7 +343,7 @@ const deleteEmployee = () => {
                 if (err) throw err;
             })
             console.log(`Deleted ${res.employee} from the database`);
-            viewEmployee();
+            start();
         });
     });
 }
@@ -367,8 +377,8 @@ const deleteDept = () => {
             connection.query(deleteDepts, {id}, err => {
                 if (err) throw err;
             })
-            console.log(`Successfully deleted ${res.department} from the database.`);
-            viewDept();
+            console.log(`Successfully deleted ${res.department} department from the database.`);
+            start();
         });
     });
 }
@@ -402,8 +412,8 @@ const deleteRole = () => {
             connection.query(deleteRoles, {id}, err => {
                 if (err) throw err;
             })
-            console.log(`Successfully deleted ${res.role} from the database`);
-            viewRole();
+            console.log(`Successfully deleted the role of ${res.role} from the database.`);
+            start();
         });
     });
 }
