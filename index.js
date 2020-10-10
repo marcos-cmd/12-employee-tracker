@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const { connection } = require('./config/connection');
-const { insertDepts, insertRoles, insertEmployees, selectDepts, selectRoles, selectEmployees, updateEmployees, selectSum, selectBudget, deleteDept, deleteRole, deleteEmployee } = require('./model/queries');
+const { insertDepts, insertRoles, insertEmployees, selectDepts, selectRoles, selectEmployees, updateEmployees, selectSum, selectBudget, selectEmployeeByManager, deleteDept, deleteRole, deleteEmployee } = require('./model/queries');
 const { startPrompt, addDeptPrompt, addRolePrompt, addEmployeePrompt } = require('./model/prompts');
 
 const start = () => {
@@ -47,7 +47,8 @@ const start = () => {
                 deleteRole();
                 break;
             default:
-                return process.exit(22);
+                process.exit(22);
+                break;
         }
     })
 };
@@ -264,7 +265,7 @@ const updateManager = () => {
     });
 }
 const viewByManager = () => {
-    connection.query(selectEmployees, (err, res) => {
+    connection.query(selectEmployeeByManager, (err, res) => {
         if (err) throw err;
         let employeeArr = [];
         for (let i =0; i < res.length; i++) {
