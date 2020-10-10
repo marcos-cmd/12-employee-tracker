@@ -47,8 +47,7 @@ const start = () => {
                 deleteRole();
                 break;
             default:
-                start();
-                break;
+                return process.exit(22);
         }
     })
 };
@@ -59,7 +58,7 @@ const addDepartment = async () => {
             connection.query(insertDepts, {name}, err => {
                 if (err) throw err;
             });
-            console.log(`Added ${name} to the database.`);
+            console.log(`Added ${name} department to the database.`);
             start();
         })
 };
@@ -69,7 +68,7 @@ const addRole = () => {
         connection.query(insertRoles, {title, salary, department_id}, err => {
             if (err) throw err;
         });
-        console.log(`Added ${title} to the database.`);
+        console.log(`Added the role of ${title} to the database.`);
         start();
     })
 }
@@ -461,6 +460,8 @@ const deptBudget = () => {
                 if (err) throw err;
                 if (res[0].total !== null) {
                     console.log(`The total utilized budget of the ${res[0].name} department is $${res[0].total.toFixed(2)}.`);
+                } else {
+                    console.log(`The total utilized budget of the ${res[0].name} department is $0.00.`)
                 }
             })
         })
