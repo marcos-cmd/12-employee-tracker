@@ -1,30 +1,27 @@
 const inquirer = require('inquirer');
-const connection = require('./config/connection');
+const { connection } = require('./config/connection');
+const { 
+    insertDepts,
+    insertRoles,
+    insertEmployees,
+    selectDepts,
+    selectRoles,
+    selectEmployees,
+    updateEmployees,
+    deleteDept,
+    deleteRole,
+    deleteEmployee,
+} = require('./model/queries');
+
+const {
+    startPrompt,
+    addDeptPrompt,
+    addRolePrompt,
+    addEmployeePrompt,
+} = require('./model/prompts');
 
 const start = () => {
-    inquirer.prompt(
-        {
-            type: 'list',
-            name: 'options',
-            message: 'Please select an option to continue:',
-            choices: 
-            [
-                'Add a Department',
-                'Add a Role',
-                'Add an Employee',
-                'View Departments',
-                'View a Role',
-                'View an Employee',
-                'Update an Employee\'s Role',
-                'Update an Employee\'s Manager',
-                'Delete a Department',
-                'Delete a Role',
-                'Delete an Employee',
-                'View Department\'s salary budget',
-                'Exit menu'
-              ]
-        }
-    ).then((answers) => {
+    inquirer.prompt(startPrompt).then((answers) => {
         console.log(answers);
         switch (answers.options) {
             case 'Add a Department':
@@ -67,15 +64,8 @@ const start = () => {
 
 const addDepartment = async () => {
     // console.log('test success');
-    const answers = await inquirer.prompt(
-        {
-            type: 'input',
-            name: 'department',
-            message: 'Which department would you like to add?'
-        }
-    ).then(({name}) => {
-            const query = 'INSERT INTO departments SET ?;';
-            connection.query(query, {name}, err => {
+    const answers = await inquirer.prompt(addDeptPrompt).then(({name}) => {
+            connection.query(insertDepts, {name}, err => {
                 if (err) throw err;
             });
             viewDept();
@@ -83,57 +73,29 @@ const addDepartment = async () => {
 };
 
 const addRole = () => {
-    inquirer.prompt([
-        {
-            name: 'title',
-            type: 'input',
-            message: 'What is the title of the role you are adding?'
-        },
-        {
-            name: 'salary',
-            type: 'input',
-            message: 'What is the proposed salary for this role?'
-        },
-        {
-            name: 'department_id',
-            type: 'input',
-            message: 'What is the department ID of the role?'
-        }
-    ]).then (({title, salary, department_id}) => {
-        const query = 'INSERT INTO roles SET ?;';
-        connection.query(query, {title, salary, department_id}, err => {
+    inquirer.prompt(addRolePrompt).then (({title, salary, department_id}) => {
+        connection.query(insertRoles, {title, salary, department_id}, err => {
             if (err) throw err;
         });
         viewRole();
     })
 }
 const addEmployee = () => {
-    connection.query('SELECT * FROM roles;', (err, res) => {
+    connection.query(selectRoles, (err, res) => {
         if (err) throw err;
         let rolesArr = [];
         for (let i=0; i < res.length; i++) {
             rolesArr.push(res[i]);
         }
-        inquirer.prompt([
-            {
-                name: 'first',
-                type: 'input',
-                message: "Enter the employee's first name"
-            },
-            {
-                name: 'last',
-                type: 'input',
-                message: "Enter the employee's last name"
-            },
-            {
-                name: 'role',
-                type: 'list', 
-                message: "Enter the title of this employee's role",
-                choices: function() {
-                    return res.map(res => res.title);
-                }
+        addEmployeePrompt.push({
+            name: 'role',
+            type: 'list', 
+            message: "Enter the title of this employee's role",
+            choices: function() {
+                return res.map(res => res.title);
             }
-        ]).then((res) => {
+            });
+        inquirer.prompt(addEmployeePrompt).then((res) => {
             let first_name = res.first;
             let last_name = res.last;
             let role_id;
@@ -142,7 +104,7 @@ const addEmployee = () => {
                     role_id = rolesArr[i].id;
                 }
             }
-            connection.query('SELECT * FROM employees;', (err, res) => {
+            connection.query(selectEmployees, (err, res) => {
                 if (err) throw err; 
                 let employeeArr = [];
                 for (let i = 0; i < res.length; i++) {
@@ -168,8 +130,7 @@ const addEmployee = () => {
                             manager_id = employeeArr[i].id;
                         }
                     }
-                    const query = 'INSERT INTO employees Set ?;';
-                    connection.query(query, {first_name, last_name, role_id, manager_id}, err => {
+                    connection.query(insertEmployees, {first_name, last_name, role_id, manager_id}, err => {
                         if (err) throw err;
                     });
                     viewEmployee();
@@ -179,28 +140,28 @@ const addEmployee = () => {
     })
 }
 const viewDept = () => {
-    connection.query('SELECT * FROM departments;', (err, res) => {
+    connection.query(selectDepts, (err, res) => {
         if (err) throw err;
         console.table(res);
         start();
     })
 }
 const viewRole = () => {
-    connection.query('SELECT * FROM roles;', (err, res) => {
+    connection.query(selectRoles, (err, res) => {
         if(err) throw err;
         console.table(res);
         start();
     })
 }
 const viewEmployee = () => {
-    connection.query('SELECT * FROM employees;', (err, res) => {
+    connection.query(selectEmployees, (err, res) => {
         if(err) throw err;
         console.table(res);
         start();
     })
 }
 const updateRole = () => {
-    connection.query('SELECT * FROM employees;', (err, res) => {
+    connection.query(selectEmployees, (err, res) => {
         if (err) throw err;
         let employeeArr = [];
         for (let i = 0; i < res.length; i++) {
@@ -226,7 +187,7 @@ const updateRole = () => {
                     id = employeeArr[i].id;
                 }
             }
-            connection.query('SELECT * FROM roles;', (err, res) => {
+            connection.query(selectEmployees, (err, res) => {
                 if (err) throw err;
                 let rolesArr = [];
                 for (let i = 0; i < res.length; i++) {
@@ -246,8 +207,7 @@ const updateRole = () => {
                             role_id = rolesArr[i].id;
                         }
                     }
-                    const query = "UPDATE employees SET ? WHERE ?;";
-                    connection.query(query, [{role_id}, {id}], err => {
+                    connection.query(updateEmployees, [{role_id}, {id}], err => {
                         if (err) throw err;
                     })
                     viewEmployee();
@@ -257,40 +217,33 @@ const updateRole = () => {
     });
 }
 const updateManager = () => {
-    connection.query('SELECT * FROM employees;', (err, res) => {
+    connection.query(selectEmployees, (err, res) => {
         if (err) throw err;
         let employeeArr = [];
         for (let i =0; i < res.length; i++) {
             employeeArr.push(res[i]);
+        }
+        const choices = () => {let arr = []
+            if (res.length > 0) {
+                for (let i = 0; i < employeeArr.length; i++) {
+                    arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
+                }
+            }
+            arr.push('None');
+            return arr;
         }
         inquirer.prompt([
             {
                 name: 'employee',
                 type: 'list',
                 message: "Whose manager are you updating?",
-                choices: function () {
-                    let arr = []
-                    if (res.length > 0) {
-                        for (let i = 0; i < employeeArr.length; i++) {
-                            arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
-                        }
-                    }
-                    return arr;
-                }
+                choices: choices
             },
             {
                 name: 'manager',
                 type: 'list',
                 message: "Who will become the manager of the selected employee?",
-                choices: function () {
-                    let arr = [];
-                    if (res.length > 0){
-                        for (let i = 0; i < employeeArr.length; i ++) {
-                            arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`)
-                        }
-                    }
-                    return arr;
-                }
+                choices: choices
             }
         ]).then(res => {
             let id; 
@@ -303,8 +256,7 @@ const updateManager = () => {
                     manager_id = employeeArr[i].id;
                 }
             }
-            const query = "UPDATE employees SET ? WHERE ?;";
-            connection.query(query, [{manager_id}, {id}], err => {
+            connection.query(updateEmployees, [{manager_id}, {id}], err => {
                 if (err) throw err;
             })
             viewEmployee();
@@ -312,7 +264,7 @@ const updateManager = () => {
     });
 }
 const deleteEmployee = () => {
-    connection.query('SELECT * FROM employees;', (err, res) => {
+    connection.query(selectEmployees, (err, res) => {
         if (err) throw err;
         let employeeArr = [];
         for (let i = 0; i < res.length; i++) {
@@ -338,8 +290,7 @@ const deleteEmployee = () => {
                     id = employeeArr[i].id;
                 }
             }
-            const query = "DELETE FROM employees WHERE ?;";
-            connection.query(query, {id}, err => {
+            connection.query(deleteEmployees, {id}, err => {
                 if (err) throw err;
             })
             console.log(`Deleted ${res.employee} from the database`);
@@ -348,7 +299,7 @@ const deleteEmployee = () => {
     });
 }
 const deleteDept = () => {
-    connection.query('SELECT * FROM departments;', (err, res) => {
+    connection.query(selectDepts, (err, res) => {
         if (err) throw err;
         let deptArr = [];
         for (let i = 0; i < res.length; i++) {
@@ -374,8 +325,7 @@ const deleteDept = () => {
                     id = deptArr[i].id;
                 }
             }
-            const query = 'DELETE FROM departments WHERE ?;';
-            connection.query(query, {id}, err => {
+            connection.query(deleteDepts, {id}, err => {
                 if (err) throw err;
             })
             console.log(`Successfully deleted ${res.department} from the database.`);
@@ -384,7 +334,7 @@ const deleteDept = () => {
     });
 }
 const deleteRole = () => {
-    connection.query('SELECT * FROM roles;', (err, res) => {
+    connection.query(selectRoles, (err, res) => {
         if (err) throw err;
         let rolesArr = [];
         for (let i = 0; i < res.length; i++) {
@@ -410,8 +360,7 @@ const deleteRole = () => {
                     id = rolesArr[i].id;
                 }
             }
-            const query = "DELETE FROM roles WHERE ?;";
-            connection.query(query, {id}, err => {
+            connection.query(deleteRoles, {id}, err => {
                 if (err) throw err;
             })
             console.log(`Successfully deleted ${res.role} from the database`);
