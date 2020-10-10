@@ -149,5 +149,25 @@ const addEmployee = () => {
         })
     })
 }
-
+const viewDept = () => {
+    connection.query('SELECT * FROM departments;', (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        start();
+    })
+}
+const viewRole = () => {
+    connection.query('SELECT * FROM roles;', (err, res) => {
+        if(err) throw err;
+        console.table(res);
+        start();
+    })
+}
+const viewEmployee = () => {
+    connection.query('SELECT * FROM employees;', (err, res) => {
+        if(err) throw err;
+        console.table(res);
+        start();
+    })
+}
 start();
