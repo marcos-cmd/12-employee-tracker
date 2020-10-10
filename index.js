@@ -54,7 +54,12 @@ const start = () => {
             case 'Delete an Employee':
                 deleteEmployee();
                 break;
-            default:
+            case 'Delete a Department':
+                deleteDept();
+                break;
+            case 'Delete a Role':
+                deleteRole();
+                break;
               break;
         }
     })
@@ -339,6 +344,42 @@ const deleteEmployee = () => {
             })
             console.log(`Deleted ${res.employee} from the database`);
             viewEmployee();
+        });
+    });
+}
+const deleteDept = () => {
+    connection.query('SELECT * FROM departments;', (err, res) => {
+        if (err) throw err;
+        let deptArr = [];
+        for (let i = 0; i < res.length; i++) {
+            deptArr.push(res[i]);
+        }
+        inquirer.prompt({
+            name: 'department',
+            type: 'list',
+            message: 'Which department would you like to delete?',
+            choices: function () {
+                let arr = []
+                if (res.length > 0) {
+                    for (let i = 0; i < deptArr.length; i++) {
+                        arr.push(deptArr[i].name);
+                    }
+                }
+                return arr;
+            }
+        }).then(res => {
+            let id;
+            for (let i = 0; i < deptArr.length; i++) {
+                if (res.department === deptArr[i].name) {
+                    id = deptArr[i].id;
+                }
+            }
+            const query = 'DELETE FROM departments WHERE ?;';
+            connection.query(query, {id}, err => {
+                if (err) throw err;
+            })
+            console.log(`Successfully deleted ${res.department} from the database.`);
+            viewDept();
         });
     });
 }
