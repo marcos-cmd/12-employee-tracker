@@ -46,7 +46,9 @@ const start = () => {
             case 'Delete a Role':
                 deleteRole();
                 break;
-              break;
+            default:
+                start();
+                break;
         }
     })
 };

@@ -1,3 +1,5 @@
+const inquirer = require("inquirer");
+
 function isNotBlank(input) {
     return input !== '' || "Cannot leave blank";
 }
@@ -6,20 +8,24 @@ const startPrompt = {
     name: 'options',
     type: 'list',
     message: 'Please select an option to continue',
-    choices: [
+    choices: [new inquirer.Separator(),
         'Add a Department',
         'Add a Role',
         'Add an Employee',
+        new inquirer.Separator(),
         'View Departments',
         'View a Role',
         'View an Employee',
+        'View Employees by Manager',
+        'View Department\'s salary budget',
+        new inquirer.Separator(),
         'Update an Employee\'s Role',
         'Update an Employee\'s Manager',
-        'View Employees by Manager',
+        new inquirer.Separator(),
         'Delete a Department',
         'Delete a Role',
         'Delete an Employee',
-        'View Department\'s salary budget',
+        new inquirer.Separator(),
         'Exit menu'
       ]
 };
