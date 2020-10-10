@@ -1,3 +1,7 @@
+function isNotBlank(input) {
+    return input !== '' || "Cannot leave blank";
+}
+
 const startPrompt = {
     name: 'options',
     type: 'list',
@@ -23,24 +27,28 @@ const startPrompt = {
    const addDeptPrompt = {
     type: 'input',
             name: 'department',
-            message: 'Which department would you like to add?'
+            message: 'Which department would you like to add?',
+            validate: isNotBlank
 };
  
    const addRolePrompt = [
     {
         name: 'title',
         type: 'input',
-        message: 'What is the title of the role you are adding?'
+        message: 'What is the title of the role you are adding?',
+        validate: isNotBlank
     },
     {
         name: 'salary',
         type: 'input',
-        message: 'What is the proposed salary for this role?'
+        message: 'What is the proposed salary for this role?',
+        validate: isNotBlank
     },
     {
         name: 'department_id',
         type: 'input',
-        message: 'What is the department ID of the role?'
+        message: 'What is the department ID of the role?',
+        validate: isNotBlank
     }
 ];
  
@@ -48,12 +56,14 @@ const startPrompt = {
     {
         name: 'first',
         type: 'input',
-        message: "Enter the employee's first name"
+        message: "Enter the employee's first name",
+        validate: isNotBlank
     },
     {
         name: 'last',
         type: 'input',
-        message: "Enter the employee's last name"
+        message: "Enter the employee's last name",
+        validate: isNotBlank
     },
 ];
  
