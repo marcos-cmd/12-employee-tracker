@@ -48,6 +48,9 @@ const start = () => {
             case 'Update an Employee\'s Role':
                 updateRole();
                 break;
+            case 'Update Employee Manager':
+                updateManager();
+                break;
             default:
               break;
         }
@@ -142,7 +145,7 @@ const addEmployee = () => {
                     type: 'list',
                     message: "Select this employee's manager",
                     choices: function() {
-                        let arr = ['None']
+                        let arr = []
                         if (res.length > 0) {
                             for (let i = 0; i < employeeArr.length; i++) {
                                 arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
@@ -242,6 +245,61 @@ const updateRole = () => {
                     viewEmployee();
                 });
             });
+        });
+    });
+}
+const updateManager = () => {
+    connection.query('SELECT * FROM employees;', (err, res) => {
+        if (err) throw err;
+        let employeeArr = [];
+        for (let i =0; i < res.length; i++) {
+            employeeArr.push(res[i]);
+        }
+        inquirer.prompt([
+            {
+                name: 'employee',
+                type: 'list',
+                message: "Whose manager are you updating?",
+                choices: function () {
+                    let arr = []
+                    if (res.length > 0) {
+                        for (let i = 0; i < employeeArr.length; i++) {
+                            arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
+                        }
+                    }
+                    return arr;
+                }
+            },
+            {
+                name: 'manager',
+                type: 'list',
+                message: "Who will become the manager of the selected employee?",
+                choices: function () {
+                    let arr = [];
+                    if (res.length > 0){
+                        for (let i = 0; i < employeeArr.length; i ++) {
+                            arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`)
+                        }
+                    }
+                    return arr;
+                }
+            }
+        ]).then(res => {
+            let id; 
+            let manager_id;
+            for (let i = 0; i < employeeArr.length; i++) {
+                if (res.employee === `${employeeArr[i].first_name} ${employeeArr[i].last_name}`) {
+                    id = employeeArr[i].id;
+                }
+                if (res.manager === `${employeeArr[i].first_name} ${employeeArr[i].last_name}`) {
+                    manager_id = employeeArr[i].id;
+                }
+            }
+            const query = "UPDATE employees SET ? WHERE ?;";
+            connection.query(query, [{manager_id}, {id}], err => {
+                if (err) throw err;
+            })
+            viewEmployee();
         });
     });
 }
