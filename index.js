@@ -383,4 +383,40 @@ const deleteDept = () => {
         });
     });
 }
+const deleteRole = () => {
+    connection.query('SELECT * FROM roles;', (err, res) => {
+        if (err) throw err;
+        let rolesArr = [];
+        for (let i = 0; i < res.length; i++) {
+            rolesArr.push(res[i]);
+        }
+        inquirer.prompt({
+            name: 'role',
+            type: 'list', 
+            message: 'Which role are you deleting?',
+            choices: function () {
+                let arr = []
+                if (res.length > 0) {
+                    for (let i = 0; i < rolesArr.length; i++) {
+                        arr.push(rolesArr[i].title);
+                    }
+                }
+                return arr;
+            }
+        }).then(res => {
+            let id; 
+            for (let i = 0; i < rolesArr.length; i++) {
+                if (res.role === rolesArr[i].title) {
+                    id = rolesArr[i].id;
+                }
+            }
+            const query = "DELETE FROM roles WHERE ?;";
+            connection.query(query, {id}, err => {
+                if (err) throw err;
+            })
+            console.log(`Successfully deleted ${res.role} from the database`);
+            viewRole();
+        });
+    });
+}
 start();
