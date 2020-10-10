@@ -34,6 +34,9 @@ const start = () => {
             case 'Delete an Employee':
                 deleteEmployee();
                 break;
+            case 'View Department\'s salary budget':
+                deptBudget();
+                break;
             case 'Delete a Department':
                 deleteDept();
                 break;
@@ -350,5 +353,52 @@ const deleteRole = () => {
             viewRole();
         });
     });
+}
+
+const deptBudget = () => {
+    connection.query(selectDepts, (err, res) => {
+        if (err) throw err;
+        let deptArr = [];
+        for (let i = 0; i < res.length; i++) {
+            deptArr.push(res[i]);
+        }
+        inquirer.prompt({
+            name: 'dept',
+            type: 'list',
+            message: "Choose a department to view its total utilized budget. i.e. the combined salaries of all employees in that department",
+            choices: function () {
+                let arr = []
+                if (res.length > 0) {
+                    for (let i = 0; i < deptArr.length; i++) {
+                        arr.push(deptArr[i].name);
+                    }
+                }
+                return arr;
+            }
+        }).then(res => {
+            connection.query(`SELECT A.id, A.first_name, A.last_name, B.title, B.salary 
+            FROM employee_trackerDB.employees A 
+            LEFT JOIN employee_trackerDB.roles B 
+            ON A.role_id = B.id 
+            LEFT JOIN employee_trackerDB.departments C 
+            ON B.department_id = C.id 
+            WHERE C.name = '${res.dept}';`, (err, res) => {
+                if (err) throw err;
+                console.table(res);
+            })
+            connection.query(`SELECT A.id, A.first_name, A.last_name, B.title, B.salary 
+            FROM employee_trackerDB.employees A 
+            LEFT JOIN employee_trackerDB.roles B 
+            ON A.role_id = B.id 
+            LEFT JOIN employee_trackerDB.departments C 
+            ON B.department_id = C.id 
+            WHERE C.name = '${res.dept}';`, (err, res) => {
+                if (err) throw err;
+                if (res[0].total !== null) {
+                    console.log(`The total utilized budget of the ${res[0].name} department is $${res[0].total.toFixed(2)}.`);
+                }
+            })
+        })
+    })
 }
 start();

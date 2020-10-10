@@ -45,16 +45,16 @@ const startPrompt = {
  
    const addEmployeePrompt = [
     {
-      name: 'first',
-      type: 'input',
-      message: "What is the employee's first name?"
+        name: 'first',
+        type: 'input',
+        message: "Enter the employee's first name"
     },
     {
-      name: 'last',
-      type: 'input',
-      message: "What is the employee's last name?"
-    }
-  ];
+        name: 'last',
+        type: 'input',
+        message: "Enter the employee's last name"
+    },
+];
  
    module.exports = {
     startPrompt,
