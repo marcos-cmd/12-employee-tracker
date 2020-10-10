@@ -11,6 +11,7 @@ const startPrompt = {
         'View an Employee',
         'Update an Employee\'s Role',
         'Update an Employee\'s Manager',
+        'View Employees by Manager',
         'Delete a Department',
         'Delete a Role',
         'Delete an Employee',
