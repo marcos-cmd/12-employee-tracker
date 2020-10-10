@@ -12,7 +12,7 @@ const start = () => {
                 'Add a Department',
                 'Add a Role',
                 'Add an Employee',
-                'View a Department',
+                'View Departments',
                 'View a Role',
                 'View an Employee',
                 'Update an Employee\'s Role',
@@ -30,6 +30,24 @@ const start = () => {
             case 'Add a Department':
               addDepartment();
               break;
+            case 'Add a Role':
+                addRole();
+                break;
+            case 'Add an Employee':
+                addEmployee();
+                break;
+            case 'View Departments':
+                viewDept();
+                break;
+            case 'View a Role':
+                viewRole();
+                break;
+            case 'View an Employee':
+                viewEmployee();
+                break;
+            case 'Update an Employee\'s Role':
+                updateRole();
+                break;
             default:
               break;
         }
@@ -99,7 +117,7 @@ const addEmployee = () => {
             {
                 name: 'role',
                 type: 'list', 
-                message: "Enter the title of this employee's role"
+                message: "Enter the title of this employee's role",
                 choices: function() {
                     return res.map(res => res.title);
                 }
@@ -113,7 +131,7 @@ const addEmployee = () => {
                     role_id = rolesArr[i].id;
                 }
             }
-            connection.query('SELECT * FROM employees ;', (err, res) => {
+            connection.query('SELECT * FROM employees;', (err, res) => {
                 if (err) throw err; 
                 let employeeArr = [];
                 for (let i = 0; i < res.length; i++) {
@@ -170,4 +188,62 @@ const viewEmployee = () => {
         start();
     })
 }
+const updateRole = () => {
+    connection.query('SELECT * FROM employees;', (err, res) => {
+        if (err) throw err;
+        let employeeArr = [];
+        for (let i = 0; i < res.length; i++) {
+            employeeArr.push(res[i]);
+        }
+        inquirer.prompt({
+            name: 'employee',
+            type: 'list',
+            message: "Which employee's role would you like to update?",
+            choices: function() {
+                let arr = ['None']
+                if (res.length > 0) {
+                    for (let i = 0; i < employeeArr.length; i++) {
+                        arr.push(`${employeeArr[i].first_name} ${employeeArr[i].last_name}`);
+                    }
+                }
+                return arr;
+            }
+        }).then(res => {
+            let id;
+            for (let i = 0; i < employeeArr.length; i++) {
+                if (res.employee === `${employeeArr[i].first_name} ${employeeArr[i].last_name}`) {
+                    id = employeeArr[i].id;
+                }
+            }
+            connection.query('SELECT * FROM roles;', (err, res) => {
+                if (err) throw err;
+                let rolesArr = [];
+                for (let i = 0; i < res.length; i++) {
+                    rolesArr.push(res[i]);
+                }
+                inquirer.prompt({
+                    name: 'role',
+                    type: 'list',
+                    message: "What would you like this employee's new role to be?",
+                    choices: function () {
+                        return res.map(res => res.title);
+                    }
+                }).then((res) => {
+                    let role_id;
+                    for (let i =0; i < rolesArr.length; i++) {
+                        if (res.role === rolesArr[i].title) {
+                            role_id = rolesArr[i].id;
+                        }
+                    }
+                    const query = "UPDATE employees SET ? WHERE ?;";
+                    connection.query(query, [{role_id}, {id}], err => {
+                        if (err) throw err;
+                    })
+                    viewEmployee();
+                });
+            });
+        });
+    });
+}
+
 start();
