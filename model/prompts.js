@@ -30,9 +30,9 @@ function isNotBlank(input) {
 }
  const addDeptPrompt = {
     type: 'input',
-            name: 'department',
-            message: 'Which department would you like to add?',
-            validate: isNotBlank
+    name: 'name',
+    message: 'Which department would you like to add?',
+    validate: isNotBlank
 };
  const addRolePrompt = [
     {

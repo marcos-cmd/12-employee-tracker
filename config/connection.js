@@ -1,15 +1,13 @@
-// require mysql for database
-const mysql = require('mysql')
-    // require util for connection to mysql
-const util = require('util');
+const mysql = require('mysql');
 
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'employeeTrackerDB',
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "password",
+  database: "employee_trackerDB"
 });
 
-connection.query = util.promisify(connection.query);
-
-module.exports = connection;
+module.exports = {
+  connection,
+}
